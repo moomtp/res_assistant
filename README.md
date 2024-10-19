@@ -1,5 +1,11 @@
 # res_assistant
 ## Usage
+
+0. 安裝boardlink
+```
+pip3 install broadlink
+```
+
 1. 在respberry pi 上安裝k3s
 ```
 curl -sfL https://get.k3s.io | sh -
