@@ -14,7 +14,7 @@ broad_agent = BroadDevice()
 def control_device():
     command = request.json.get('command')
     if command == 'turn_on':
-        GPIO.output(LEFD_PIN, GPIO.HIGH)
+        # GPIO.output(LEFD_PIN, GPIO.HIGH)
         return "Device turned on"
     elif command == 'set_28_degree':
         broad_agent.send_sign('28')

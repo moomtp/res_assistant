@@ -1,0 +1,15 @@
+---
+- name: Deploy my-app to Kubernetes
+  hosts: k8s-cluster  # TODO : Inventory 中設置的 Kubernetes 節點
+  tasks:
+    - name: Apply Kubernetes deployment
+      k8s:
+        kubeconfig: "/path/to/kubeconfig"  # TODO : kubeconfig 檔案的路徑
+        definition: "{{ lookup('file', 'my-app-deployment.yaml') }}"
+        state: present
+
+    - name: Apply Kubernetes service
+      k8s:
+        kubeconfig: "/path/to/kubeconfig"
+        definition: "{{ lookup('file', 'my-app-service.yaml') }}"
+        state: present
