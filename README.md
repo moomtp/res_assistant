@@ -101,24 +101,32 @@ kubectl logs deployment/google-assistant
 
 # file detail
 
-ansible : <br>
+### ansible : <br>
 anisible.cfg : anisible config
+
 deploy-service.yml : anisible playbook to deploy k8s cluster 
+
 inventory.ini : anisible inventory
 
-k8s : <br>
+### k8s : <br>
+my-app-service.yaml : service config
 
+my-app-deployment.yaml : k8s config
 
 
 # how to use
 
-
-
 testing inventory config
-```ansible all -m ping -i inventory.ini```
+
+```
+ansible all -m ping -i inventory.ini
+```
 
 deploy by ansible playbook
-```ansible-playbook -i inventory.ini deploy-my-app.yml```
+
+```
+ansible-playbook -i inventory.ini deploy-my-app.yml
+```
 
 testing k8s nodes <br>
 ```
