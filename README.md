@@ -99,12 +99,33 @@ kubectl logs deployment/google-assistant
 
 使用 Kubernetes 的自動擴展特性，根據流量需求自動擴展 Google Assistant 的實例數量。你也可以集成監控工具如 Prometheus 或 Grafana，來實時監控服務的性能和健康狀態。
 
-# file's
+# file detail
 
+ansible : <br>
 anisible.cfg : anisible config
 deploy-service.yml : anisible playbook to deploy k8s cluster 
 inventory.ini : anisible inventory
 
+k8s : <br>
+
+
+
+# how to use
+
+
+
+testing inventory config
+```ansible all -m ping -i inventory.ini```
+
+deploy by ansible playbook
+```ansible-playbook -i inventory.ini deploy-my-app.yml```
+
+testing k8s nodes <br>
+```
+kubectl get deployments
+kubectl get pods
+kubectl get services
+```
 
 
 ## Tech Stack
