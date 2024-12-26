@@ -8,18 +8,23 @@ class BroadDevice:
                 , "off" : b'&\x00\x88\x00\xd9\xee\x112\x11r\x112\x112\x11s\x11r\x12r\x112\x112\x11r\x121\x112\x11s\x11r\x12r\x112\x11s\x111\x121\x112\x112\x111\x121\x11s\x112\x112\x111\x112\x112\x112\x111\x112\x112\x112\x111\x121\x121\x112\x11r\x121\x121\x112\x111\x122\x111\x112\x112\x112\x111\x121\x112\x112\x111\x121\x112\x11s\x111\x121\x11s\x112\x11r\x12r\x112\x11s\x10\xf0\x11\x00\r\x05'
     }
 
-    def __init__(self):
-        devices = broadlink.discover()
-        try :
-            devices[0]
-        except :
-            raise ValueError("找不到裝置")
-        self.device = devices[0]
+    def __init__(self, ip:str = ""):
+        if(ip == ""):
+            devices = broadlink.discover()
+            try :
+                devices[0]
+            except :
+                raise ValueError("找不到裝置")
+            self.device = devices[0]
+
+        else:
+            device = broadlink.hello(ip)
+            self.device = device
 
         self.device.auth()
 
     def send_sign(self, sign:str):
-        self.device.send_packet(self.air_condi_code[sign])
+        self.device.send_data(self.air_condi_code[sign])
 
 
 
