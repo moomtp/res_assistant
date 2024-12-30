@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const clients = {
@@ -13,6 +14,7 @@ app.post("/token", (req, res) => {
   const { client_id, client_secret, grant_type } = req.body;
 
   if (!client_id || !client_secret || grant_type !== "client_credentials") {
+    // console.log(client_id);
     return res.status(400).json({ error: "Invalid request" });
   }
 
@@ -30,7 +32,6 @@ app.post("/token", (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log("Authorization Server is running on port 3000"));
 
 
 
@@ -53,3 +54,7 @@ app.post("/protected-resource", (req, res) => {
 
   res.json({ message: "Access granted to protected resource" });
 });
+
+
+
+app.listen(3000, () => console.log("Authorization Server is running on port 3000"));
