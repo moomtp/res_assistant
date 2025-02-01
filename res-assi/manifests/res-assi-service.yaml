@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: res-assi-server
+spec:
+  selector:
+    app: res-assi-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer  # 可以根據需要改為 NodePort 或 ClusterIP

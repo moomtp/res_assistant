@@ -1,0 +1,22 @@
+
+{
+  "client_id_A": {
+    "secret": "client_secret_A",
+    "scope": ["read", "write"],
+    "name": "Service A",
+    "active": true
+  },
+  "client_id_B": {
+    "secret": "client_secret_B",
+    "scope": ["read"],
+    "name": "Service B",
+    "active": true
+  },
+  "client_id_C": {
+    "secret": "client_secret_C",
+    "scope": ["read", "write", "admin"],
+    "name": "Service C",
+    "active": false
+  }
+}
+

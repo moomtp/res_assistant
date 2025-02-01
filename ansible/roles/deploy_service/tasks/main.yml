@@ -1,0 +1,4 @@
+- name: Deploy oauth2
+  ansible.builtin.include_tasks: deploy-oauth2.yml
+- name: Deploy res assi
+  ansible.builtin.include_tasks: deploy-res-assi.yml

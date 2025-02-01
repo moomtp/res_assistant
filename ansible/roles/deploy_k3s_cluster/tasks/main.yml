@@ -1,0 +1,11 @@
+- name: Install k3s server
+  ansible.builtin.include_tasks: k3s-install-server.yml
+  when: inventory_hostname == "k3s-master"
+
+- name: Modify config
+  ansible.builtin.include_tasks: modify-k3s-conf.yml
+  when: inventory_hostname == "localhost"
+
+- name: Install k3s workers
+  ansible.builtin.include_tasks: k3s-install-workers.yml
+  when: inventory_hostname == "k3s-workers"

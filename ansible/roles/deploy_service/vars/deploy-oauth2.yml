@@ -1,0 +1,7 @@
+docker_image: "moomtp/oauth2-server:latest"
+k3s_namespace: "default"
+k3s_deployment_name: "oauth2-server"
+replicas: 1
+container_port: 3000
+kubeconfig: /etc/rancher/k3s/k3s.yaml
+k3s_server_args: "--docker"

@@ -1,0 +1,11 @@
+- name: Change file permissions
+  ansible.builtin.file:
+    path: /home/e/.kube/config
+    mode: "0600"
+
+- name: Update ip in config
+  ansible.builtin.replace:
+    path: /home/e/.kube/config
+    regexp: 'server: https://127\.0\.0\.1:6443'
+    replace: "server: https://{{ hostvars['k3s-master']['ansible_host'] }}:6443"
+  become: true

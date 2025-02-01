@@ -1,0 +1,48 @@
+- name: Populate service facts
+
+  ansible.builtin.service_facts:
+
+- name: Install k3s server
+
+  when: "'k3s_service' not in ansible_facts.services"
+  block: 
+    - name: Download k3s install script
+      ansible.builtin.get_url:
+        url: https://get.k3s.io
+        dest: /tmp/k3s_install.sh
+        mode: "0755"
+
+    - name: Execute th k3s install script
+      ansible.builtin.command: sh /tmp/k3s_install.sh
+      environment:
+        INSTALL_K3S_EXEC: "server --tls-san {{ hostvars['k3s-master']['ansible_host']}}"
+      changed_when: true
+
+    - name: Print var
+      debug:
+        var: hostvars['k3s-master']['ansible_host']
+
+    - name: Check k3s server status
+      ansible.builtin.systemd_service:
+        name: k3s.service
+        state: started
+        enabled: true
+    
+- name: Get k3s server token
+  become: true
+  ansible.builtin.command: cat /var/lib/rancher/k3s/server/node-token
+  changed_when: false
+  register: k3s_server_token
+
+- name: print token
+  debug:
+    # var: hostvars['k3s-master']['k3s_token']
+    var: k3s_server_token
+
+- name: copy config
+  become: true
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~/.kube/config
+    flat: true
+

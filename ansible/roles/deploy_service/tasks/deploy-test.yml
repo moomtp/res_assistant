@@ -1,0 +1,41 @@
+
+- name: Create directory for test scripts
+  file:
+    path: /opt/k3s/tests
+    state: directory
+    mode: '0755'
+
+- name: Copy test script from local to master
+  copy:
+    src: ./test_res_assi.py  # Your local script path
+    dest: /opt/k3s/tests/test_res_assi.py
+    mode: '0755'
+
+# - name: Ensure required packages are installed
+#   package:
+#     name: "{{ item }}"
+#     state: present
+#   with_items:
+#     - curl
+#     - jq  # Add any other dependencies your script needs
+
+- name: Execute test script
+  shell: |
+    cd /opt/k3s/tests
+    python3 ./test_script.sh
+  register: test_results
+
+- name: Display test results
+  debug:
+    var: test_results.stdout_lines
+
+- name: Check for test failures
+  fail:
+    msg: "Tests failed with error: {{ test_results.stderr }}"
+  when: test_results.rc != 0
+
+- name: Clean up test script
+  file:
+    path: /opt/k3s/tests/test_script.sh
+    state: absent
+  when: cleanup_script | default(false) | bool

@@ -1,0 +1,4 @@
+---
+- hosts: k3s-master
+  roles:
+    - deploy_service

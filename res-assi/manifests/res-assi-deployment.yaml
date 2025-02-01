@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: res-assi-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: res-assi-server
+  template:
+    metadata:
+      labels:
+        app: res-assi-server
+    spec:
+      containers:
+      - name: res-assi-server
+        image: moomtp/res-assi-server:latest  # 替換為你的 Docker Hub 用戶名和映像名稱
+        ports:
+        - containerPort: 5000

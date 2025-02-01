@@ -1,0 +1,80 @@
+---
+- name: Deploy Docker image to Kubernetes workers
+  hosts:  k3s-master
+  become: true
+  vars:
+    docker_image: "moomtp/oauth2-server:latest"
+    k3s_namespace: "default"
+    k3s_deployment_name: "oauth2-server"
+    replicas: 1
+    container_port: 3000
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    k3s_server_args: "--docker"
+
+  tasks:
+    - name: Install required packages
+      package:
+        name:
+          - python3-pip
+          - python3-docker
+        state: present
+
+    - name: Install kubernetes python package
+      pip:
+        name: kubernetes
+        state: present
+
+    # - name: Create namespace if it doesn't exist
+    #   k8s:
+    #     name: "{{ k3s_namespace }}"
+    #     api_version: v1
+    #     kind: Namespace
+    #     state: present
+
+    - name: Deploy application
+      k8s:
+        state: present
+        # definition: "{{ lookup('file', 'k3s.yaml') }}"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: "{{ k3s_deployment_name }}"
+            namespace: "{{ k3s_namespace }}"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: "{{ k3s_deployment_name }}"
+            template:
+              metadata:
+                labels:
+                  app: "{{ k3s_deployment_name }}"
+              spec:
+                nodeSeletctor:
+                  resource-type: res
+                containers:
+                - name: "{{ k3s_deployment_name }}"
+                  image: "{{ docker_image }}"
+                  imagePullPolicy: Always
+                  ports:
+                  - containerPort: 3000
+
+    - name: Create service
+      k8s:
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: "{{ k3s_deployment_name }}"
+            namespace: "{{ k3s_namespace }}"
+          spec:
+            type: NodePort
+            ports:
+            - port: 3000
+              targetPort: 3000
+            selector:
+              app: "{{ k3s_deployment_name }}"

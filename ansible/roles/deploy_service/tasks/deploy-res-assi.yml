@@ -1,0 +1,76 @@
+- name: Include nginx install variables
+  include_vars: deploy-res-assi.yml
+
+- name: Install required packages
+  package:
+    name:
+      - python3-pip
+      - python3-docker
+    state: present
+
+# - name: Install kubernetes python package
+#   pip:
+#     name: kubernetes
+#     state: present
+
+# - name: Create namespace if it doesn't exist
+#   k8s:
+#     name: "{{ k3s_namespace }}"
+#     api_version: v1
+#     kind: Namespace
+#     state: present
+#
+- debug:
+    var: docker_image
+
+- debug:
+    msg: "docker image: '{{ docker_image }}'"
+
+- name: Deploy application
+  k8s:
+    state: present
+    # force: yes
+    # definition: "{{ lookup('file', 'k3s.yaml') }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ k3s_deployment_name }}"
+        namespace: "{{ k3s_namespace }}"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: "{{ k3s_deployment_name }}"
+        template:
+          metadata:
+            labels:
+              app: "{{ k3s_deployment_name }}"
+          spec:
+            # nodeSelector:
+            #   resource-type: res
+            containers:
+            - name: "{{ k3s_deployment_name }}"
+              image: "{{ docker_image }}"
+              imagePullPolicy: Always
+              ports:
+              - containerPort: 5000
+
+- name: Create service
+  k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ k3s_deployment_name }}"
+        namespace: "{{ k3s_namespace }}"
+      spec:
+        type: NodePort
+        ports:
+        - port: 5000
+          targetPort: 5000
+        selector:
+          app: "{{ k3s_deployment_name }}"

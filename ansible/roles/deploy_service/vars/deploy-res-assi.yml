@@ -1,0 +1,7 @@
+docker_image: "moomtp/res-assi-server:latest"
+k3s_namespace: "default"
+k3s_deployment_name: "res-assi-server"
+replicas: 1
+container_port: 5000
+kubeconfig: /etc/rancher/k3s/k3s.yaml
+k3s_server_args: "--docker"
