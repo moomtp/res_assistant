@@ -72,5 +72,6 @@
         ports:
         - port: 5000
           targetPort: 5000
+          nodePort: 30050
         selector:
           app: "{{ k3s_deployment_name }}"

@@ -12,6 +12,9 @@ app.use(express.urlencoded({ extended: true }));
 // Initialize the revoked tokens set
 const revokedTokens = new Set();
 
+app.get("/token", async(req, res)=>{
+  
+})
 // Token generation endpoint
 app.post("/token", async (req, res) => {
   try {
