@@ -1,6 +1,16 @@
 # pylint: disable=unused-import
 
 import requests
+import sys
+
+# sys.argv 是一個列表，包含執行命令時的所有參數
+print("腳本名稱:", sys.argv[0])  # 第一個元素是腳本名稱
+if len(sys.argv) > 1:
+    print("傳入的參數:", sys.argv[1:])  # 讀取所有參數（從 index 1 開始）
+    ip =  sys.argv[1]
+else:
+    ip = "192.168.1.106"
+
 # import jwt 
 # from dotenv import load_dotenv
 # from functools import wraps
@@ -17,8 +27,12 @@ def test_integration():
     # api_server = "http://10.123.250.15:30726"
     
     # product ip
-    oauth_server = "http://192.168.1.106:30030"
-    api_server = "http://192.168.1.106:30050"
+    # oauth_server = "http://192.168.1.106:30030"
+    # api_server = "http://192.168.1.106:30050"
+
+
+    oauth_server = "http://" + ip  + ":30030"
+    api_server = "http://" + ip  + ":30050"
     
     # Step 1: Get OAuth token
     token_response = requests.post(
