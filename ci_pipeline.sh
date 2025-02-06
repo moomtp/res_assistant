@@ -1,4 +1,6 @@
 # TODO: implement on staging_host
-ansible-playbook -i ansible/inventory/staging_host.yml ansible/playbooks/deploy_service.yml --roles-path=ansible/roles
+cd ansible
+ansible-playbook -i inventory/staging_host.yml playbooks/deploy_service.yml
 # TODO: test on staging_host's master node
+cd ..
 python3 test/test_res_assi.py 10.123.250.15
