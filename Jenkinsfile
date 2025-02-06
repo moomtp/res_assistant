@@ -26,8 +26,8 @@ pipeline {
                     echo "Building the project..."
                     sh "docker buildx install && docker buildx create --use"
                     
-                    //sh 'docker login --username "$(jq -r .username /home/jenkins/docker_info.json)"" --password-stdin <<< "$(jq -r .password /home/jenkins/docker_info.json)"'
-                    //sh "cd ${REPO_PATH} && ./build_pipeline.sh"
+                    sh 'docker login --username "$(jq -r .username /home/jenkins/docker_info.json)"" --password-stdin <<< "$(jq -r .password /home/jenkins/docker_info.json)"'
+                    sh "cd ${REPO_PATH} && ./build_pipeline.sh"
                 }
             }
         }
