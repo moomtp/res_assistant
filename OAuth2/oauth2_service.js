@@ -158,9 +158,13 @@ app.post("/token",debugMiddleware, async (req, res) => {
   try {
     const { client_id, client_secret, grant_type, authCode, refresh_token } = req.body;
     const clientInfo = await validateClientCredentials(client_id, client_secret, res);
-    if (!clientInfo) return;
+    if (!clientInfo){
+      console.log("can't match any user info!!");
+      return;
+    } 
     
 
+    console.log("Generating token...");
     switch (grant_type) {
       case "client_credentials":
         if (!authCode || authCode !== "xxxxxx") {
