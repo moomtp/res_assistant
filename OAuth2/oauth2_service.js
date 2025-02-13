@@ -14,18 +14,68 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret_key", resave: false, saveUninitialized: true }));
 app.use(cookieParser()); // 解析 Cookie
 
-app.use((req, res, next) => {
-  console.log(`Received ${req.method} request to ${req.url}`);
-  console.log('Headers:', req.headers);
-  console.log('Query Params:', req.query);
-  console.log('Body:', req.body);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`Received ${req.method} request to ${req.url}`);
+//   console.log('Headers:', req.headers);
+//   console.log('Query Params:', req.query);
+//   console.log('Body:', req.body);
+//   next();
+// });
 
 // Initialize the revoked tokens set
 const revokedTokens = new Set();
 
+//  ===================== sub function  ================================
+// 生成 Access Token 的函數
+const generateAccessToken = (clientInfo) => {
+  const issuedAt = Math.floor(Date.now() / 1000);
+  const expiresAt = issuedAt + config.jwt.tokenExpiration;
 
+  return {
+    access_token: jwt.sign(
+      {
+        client_id: clientInfo.clientId,
+        scope: clientInfo.scope,
+        name: clientInfo.name,
+        type: "access_token",
+        iat: issuedAt,
+        exp: expiresAt
+      },
+      config.jwt.secret
+    ),
+    token_type: "bearer",
+    expires_in: config.jwt.tokenExpiration,
+    scope: clientInfo.scope.join(" "),
+    client_name: clientInfo.name,
+    issued_at: issuedAt,
+    expires_at: expiresAt
+  };
+};
+
+// 驗證 client_id 和 client_secret
+const validateClientCredentials = async (client_id, client_secret, res) => {
+  if (!client_id || !client_secret) {
+    res.status(400).json({
+      error: "invalid_request",
+      error_description: "Missing client_id or client_secret"
+    });
+    return null;
+  }
+
+  const clientInfo = await clientManager.validateClient(client_id, client_secret);
+  if (!clientInfo) {
+    res.status(401).json({
+      error: "invalid_client",
+      error_description: "Invalid client credentials"
+    });
+    return null;
+  }
+
+  return clientInfo;
+};
+
+
+// ====================== HTTP ports  =================================
 
 app.get("/login", (req, res) => {
   const { redirect_uri, state } = req.query;
@@ -85,67 +135,112 @@ app.get("/auth", (req, res) => {
 // Token 生成端點
 app.post("/token", async (req, res) => {
   try {
-    const { client_id, client_secret, grant_type } = req.body;
-    const {authCode} = req.body;
+    const { client_id, client_secret, grant_type, authCode, refresh_token } = req.body;
+    const clientInfo = await validateClientCredentials(client_id, client_secret, res);
+    if (!clientInfo) return;
     
+
+    switch (grant_type) {
+      case "client_credentials":
+        if (!authCode || authCode !== "xxxxxx") {
+          return res.status(400).json({
+            error: "invalid_request",
+            error_description: "Invalid or missing authCode"
+          });
+        }
+        return res.json(generateAccessToken(clientInfo));
+
+      case "authorization_code":
+        if (!authCode || authCode !== "xxxxxx") {
+          return res.status(400).json({
+            error: "invalid_grant",
+            error_description: "Invalid authorization code"
+          });
+        }
+        const refreshToken = jwt.sign(
+          { client_id: clientInfo.clientId, type: "refresh_token", iat: Math.floor(Date.now() / 1000) },
+          config.jwt.secret
+        );
+        return res.json({ ...generateAccessToken(clientInfo), refresh_token: refreshToken });
+
+      case "refresh_token":
+        if (!refresh_token) {
+          return res.status(400).json({
+            error: "invalid_request",
+            error_description: "Missing refresh_token"
+          });
+        }
+        try {
+          const decoded = jwt.verify(refresh_token, config.jwt.secret);
+          if (decoded.type !== "refresh_token") {
+            throw new Error("Invalid refresh token type");
+          }
+          return res.json(generateAccessToken(clientInfo));
+        } catch (error) {
+          return res.status(400).json({
+            error: "invalid_grant",
+            error_description: "Invalid refresh token"
+          });
+        }
+
+      default:
+        return res.status(400).json({
+          error: "unsupported_grant_type",
+          error_description: "Invalid grant_type"
+        });
+    }
+
     // 驗證請求參數是否完整且正確
-    if (!client_id || !client_secret || grant_type !== "client_credentials") {
-      return res.status(400).json({
-        error: "invalid_request",
-        error_description: "Missing or invalid parameters"
-      });
-    }
+    // if (!client_id || !client_secret) {
+    //   return res.status(400).json({
+    //     error: "invalid_request",
+    //     error_description: "Missing or invalid parameters"
+    //   });
+    // }
+    // if(!authCode || authCode != "xxxxxx"){
+    //   return res.status(400).json({
+    //     error: "invalid_request",
+    //     error_description: "AuthCode is not valid(mismatch or NULL)"
+    //   });
+    // }
 
-    if(!authCode){
-      return res.status(400).json({
-        error: "invalid_request",
-        error_description: "Missing authCode"
-      });
-    }
 
-    if(authCode != "xxxxxx"){
-      return res.status(400).json({
-        error: "invalid_request",
-        error_description: "authCode mismatch"
-      });
-    }
-
-    // 驗證客戶端憑證是否有效
-    const clientInfo = await clientManager.validateClient(client_id, client_secret);
-    if (!clientInfo) {
-      return res.status(401).json({
-        error: "invalid_client",
-        error_description: "Invalid client credentials"
-      });
-    }
-
-    // 生成帶有明確過期時間的 token
-    const issuedAt = Math.floor(Date.now() / 1000);  // 獲取當前時間戳（秒）
-    const expiresAt = issuedAt + config.jwt.tokenExpiration;  // 計算過期時間
-    
-    // 使用 JWT 簽署 token，包含必要的訊息
-    const accessToken = jwt.sign(
-      {
-        client_id: clientInfo.clientId,    // 客戶端 ID
-        scope: clientInfo.scope,           // 權限範圍
-        name: clientInfo.name,             // 客戶端名稱
-        type: "access_token",              // token 類型
-        iat: issuedAt,                     // 簽發時間
-        exp: expiresAt                     // 過期時間
-      },
-      config.jwt.secret                    // 使用配置的密鑰進行簽署
-    );
-
-    // 返回成功生成的 token 資訊
-    res.json({
-      access_token: accessToken,
-      token_type: "bearer",
-      expires_in: config.jwt.tokenExpiration,
-      scope: clientInfo.scope.join(" "),
-      client_name: clientInfo.name,
-      issued_at: issuedAt,
-      expires_at: expiresAt
-    });
+    // // 驗證客戶端憑證是否有效
+    // const clientInfo = await clientManager.validateClient(client_id, client_secret);
+    // if (!clientInfo) {
+    //   return res.status(401).json({
+    //     error: "invalid_client",
+    //     error_description: "Invalid client credentials"
+    //   });
+    // }
+    //
+    // // 生成帶有明確過期時間的 token
+    // const issuedAt = Math.floor(Date.now() / 1000);  // 獲取當前時間戳（秒）
+    // const expiresAt = issuedAt + config.jwt.tokenExpiration;  // 計算過期時間
+    //
+    // // 使用 JWT 簽署 token，包含必要的訊息
+    // const accessToken = jwt.sign(
+    //   {
+    //     client_id: clientInfo.clientId,    // 客戶端 ID
+    //     scope: clientInfo.scope,           // 權限範圍
+    //     name: clientInfo.name,             // 客戶端名稱
+    //     type: "access_token",              // token 類型
+    //     iat: issuedAt,                     // 簽發時間
+    //     exp: expiresAt                     // 過期時間
+    //   },
+    //   config.jwt.secret                    // 使用配置的密鑰進行簽署
+    // );
+    //
+    // // 返回成功生成的 token 資訊
+    // res.json({
+    //   access_token: accessToken,
+    //   token_type: "bearer",
+    //   expires_in: config.jwt.tokenExpiration,
+    //   scope: clientInfo.scope.join(" "),
+    //   client_name: clientInfo.name,
+    //   issued_at: issuedAt,
+    //   expires_at: expiresAt
+    // });
 
   } catch (error) {
     // 錯誤處理：記錄錯誤並返回適當的錯誤響應

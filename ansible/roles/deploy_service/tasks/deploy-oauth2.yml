@@ -82,7 +82,5 @@
         selector:
           app: "{{ k3s_deployment_name }}"
 
-
 - name: Restart deployment
-  command: kubectl rollout restart deployment oauth2-server
-
+  ansible.builtin.shell: kubectl rollout restart deployment oauth2-server
