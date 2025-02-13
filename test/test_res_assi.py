@@ -40,7 +40,9 @@ def test_integration():
         json={
             "client_id": "client_id_A",
             "client_secret": "client_secret_A",
-            "grant_type": "client_credentials"
+            "grant_type": "client_credentials",
+            "authCode": "xxxxxx",
+            
         }
     )
     

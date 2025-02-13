@@ -63,6 +63,9 @@
               ports:
               - containerPort: 3000
 
+- name: Restart deployment
+  ansible.builtin.shell: kubectl rollout restart deployment oauth2-server
+
 - name: Create service
   k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
@@ -81,6 +84,3 @@
           nodePort: 30030
         selector:
           app: "{{ k3s_deployment_name }}"
-
-- name: Restart deployment
-  ansible.builtin.shell: kubectl rollout restart deployment oauth2-server

@@ -74,6 +74,27 @@ const validateClientCredentials = async (client_id, client_secret, res) => {
   return clientInfo;
 };
 
+const debugMiddleware = (req, res, next) => {
+    console.log('\n=== Debug Info ===');
+    console.log(`Time: ${new Date().toISOString()}`);
+    console.log(`Path: ${req.path}`);
+    console.log(`Method: ${req.method}`);
+    
+    // 印出 Query 參數
+    if (Object.keys(req.query).length > 0) {
+        console.log('\nQuery Parameters:');
+        console.log(JSON.stringify(req.query, null, 2));
+    }
+    
+    // 印出 Body 資料
+    if (req.body && Object.keys(req.body).length > 0) {
+        console.log('\nRequest Body:');
+        console.log(JSON.stringify(req.body, null, 2));
+    }
+    
+    console.log('================\n');
+    next();
+};
 
 // ====================== HTTP ports  =================================
 
@@ -133,7 +154,7 @@ app.get("/auth", (req, res) => {
 // oauth test url sample : http://127.0.0.1:3000/auth?redirect_uri=https://www.google.com/
 
 // Token 生成端點
-app.post("/token", async (req, res) => {
+app.post("/token",debugMiddleware, async (req, res) => {
   try {
     const { client_id, client_secret, grant_type, authCode, refresh_token } = req.body;
     const clientInfo = await validateClientCredentials(client_id, client_secret, res);
