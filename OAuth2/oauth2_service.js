@@ -182,6 +182,7 @@ app.post("/token",debugMiddleware, async (req, res) => {
           { client_id: clientInfo.clientId, type: "refresh_token", iat: Math.floor(Date.now() / 1000) },
           config.jwt.secret
         );
+        console.log(`res: ${res.json({ ...generateAccessToken(clientInfo), refresh_token: refreshToken })}`);
         return res.json({ ...generateAccessToken(clientInfo), refresh_token: refreshToken });
 
       case "refresh_token":
