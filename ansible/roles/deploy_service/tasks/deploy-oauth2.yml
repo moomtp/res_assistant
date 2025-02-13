@@ -46,6 +46,7 @@
         namespace: "{{ k3s_namespace }}"
       spec:
         replicas: 1
+        revisionHistoryLimit: 2
         selector:
           matchLabels:
             app: "{{ k3s_deployment_name }}"
