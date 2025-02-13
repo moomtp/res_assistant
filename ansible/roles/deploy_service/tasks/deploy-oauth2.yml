@@ -81,3 +81,8 @@
           nodePort: 30030
         selector:
           app: "{{ k3s_deployment_name }}"
+
+
+- name: Restart deployment
+  command: kubectl rollout restart deployment oauth2-server
+

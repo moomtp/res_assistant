@@ -75,3 +75,7 @@
           nodePort: 30050
         selector:
           app: "{{ k3s_deployment_name }}"
+
+- name: Restart deployment
+  command: kubectl rollout restart deployment res-assi-server
+	
