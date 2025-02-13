@@ -184,7 +184,7 @@ app.post("/token",debugMiddleware, async (req, res) => {
             error_description: "Invalid authorization code"
           });
         }
-        console.log("authCode :" ${authCode});
+        console.log(`authCode : ${authCode}`);
         const refreshToken = jwt.sign(
           { client_id: clientInfo.clientId, type: "refresh_token", iat: Math.floor(Date.now() / 1000) },
           config.jwt.secret
