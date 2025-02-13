@@ -162,6 +162,8 @@ app.post("/token",debugMiddleware, async (req, res) => {
       console.log("can't match any user info!!");
       return;
     } 
+    console.log(`client_info: ${client_info}`);
+
     
 
     console.log("Generating token...");
@@ -182,11 +184,12 @@ app.post("/token",debugMiddleware, async (req, res) => {
             error_description: "Invalid authorization code"
           });
         }
+        console.log("authCode :" ${authCode});
         const refreshToken = jwt.sign(
           { client_id: clientInfo.clientId, type: "refresh_token", iat: Math.floor(Date.now() / 1000) },
           config.jwt.secret
         );
-        console.log(`res: ${res.json({ ...generateAccessToken(clientInfo), refresh_token: refreshToken })}`);
+        console.log(`res: ${res}`);
         return res.json({ ...generateAccessToken(clientInfo), refresh_token: refreshToken });
 
       case "refresh_token":
