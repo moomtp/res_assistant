@@ -14,6 +14,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({ secret: "secret_key", resave: false, saveUninitialized: true }));
 app.use(cookieParser()); // 解析 Cookie
 
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`);
+  console.log('Headers:', req.headers);
+  console.log('Query Params:', req.query);
+  console.log('Body:', req.body);
+  next();
+});
+
 // Initialize the revoked tokens set
 const revokedTokens = new Set();
 
