@@ -158,7 +158,7 @@ app.get("/auth", (req, res) => {
 // Token 生成端點
 app.post("/token",debugMiddleware, async (req, res) => {
   try {
-    const { client_id, client_secret, grant_type, authCode, refresh_token } = req.body;
+    const { client_id, client_secret, grant_type, code, refresh_token } = req.body;
     const clientInfo = await validateClientCredentials(client_id, client_secret, res);
     if (!clientInfo){
       console.log("can't match any user info!!");
@@ -173,7 +173,7 @@ app.post("/token",debugMiddleware, async (req, res) => {
     console.log("Generating token...");
     switch (grant_type) {
       case "client_credentials":
-        if (!authCode || authCode !== "xxxxxx") {
+        if (!code || code !== "xxxxxx") {
           return res.status(400).json({
             error: "invalid_request",
             error_description: "Invalid or missing authCode"
@@ -182,13 +182,13 @@ app.post("/token",debugMiddleware, async (req, res) => {
         return res.json(generateAccessToken(clientInfo));
 
       case "authorization_code":
-        if (!authCode || authCode !== "xxxxxx") {
+        if (!code || code !== "xxxxxx") {
           return res.status(400).json({
             error: "invalid_grant",
             error_description: "Invalid authorization code"
           });
         }
-        console.log(`authCode : ${authCode}`);
+        console.log(`authCode : ${code}`);
         const refreshToken = jwt.sign(
           { client_id: clientInfo.clientId, type: "refresh_token", iat: Math.floor(Date.now() / 1000) },
           config.jwt.secret
