@@ -1,5 +1,6 @@
 - name: Include nginx install variables
   include_vars: deploy-res-assi.yml
+  
 
 - name: Install required packages
   package:
@@ -58,11 +59,15 @@
               ports:
               - containerPort: 5000
 
-- name: Restart deployment
+- name: Restarting deployment
   ansible.builtin.shell: kubectl rollout restart deployment res-assi-server
 
+- name: Wait for 2 seconds after restart
+  pause:
+  seconds: 2
+
 - name: Create service
-  k8s:
+  kubernetes.core.k8s:
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     state: present
     definition:
