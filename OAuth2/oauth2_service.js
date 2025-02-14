@@ -63,6 +63,8 @@ const validateClientCredentials = async (client_id, client_secret, res) => {
   }
 
   const clientInfo = await clientManager.validateClient(client_id, client_secret);
+  // console.log(`client_secret: ${client_secret}`);
+  // console.log(`client_info: ${client_info}`);
   if (!clientInfo) {
     res.status(401).json({
       error: "invalid_client",
@@ -162,7 +164,9 @@ app.post("/token",debugMiddleware, async (req, res) => {
       console.log("can't match any user info!!");
       return;
     } 
-    console.log(`client_info: ${client_info}`);
+
+    // console.log(`clientInfo: ${clientInfo}`);
+    console.log(`clientInfo: ${JSON.stringify(clientInfo, null, 2)}`);
 
     
 

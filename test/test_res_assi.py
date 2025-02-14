@@ -9,7 +9,7 @@ if len(sys.argv) > 1:
     print("傳入的參數:", sys.argv[1:])  # 讀取所有參數（從 index 1 開始）
     ip =  sys.argv[1]
 else:
-    ip = "192.168.1.106"
+    ip = "localhost"
 
 # import jwt 
 # from dotenv import load_dotenv
@@ -19,8 +19,8 @@ else:
 
 def test_integration():
     # OAuth2 service configuration
-    # oauth_server = "http://localhost:3000"
-    # api_server = "http://localhost:5000"
+    oauth_server = "http://localhost:3000"
+    api_server = "http://localhost:5000"
    
     # staging ip
     # oauth_server = "http://10.123.250.15:32571"
@@ -31,8 +31,8 @@ def test_integration():
     # api_server = "http://192.168.1.106:30050"
 
 
-    oauth_server = "http://" + ip  + ":30030"
-    api_server = "http://" + ip  + ":30050"
+    # oauth_server = "http://" + ip  + ":30030"
+    # api_server = "http://" + ip  + ":30050"
     
     # Step 1: Get OAuth token
     token_response = requests.post(
