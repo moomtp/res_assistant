@@ -64,7 +64,7 @@
 
 - name: Wait for 2 seconds after restart
   pause:
-  seconds: 2
+    seconds: 2
 
 - name: Create service
   kubernetes.core.k8s:
