@@ -41,7 +41,7 @@ def test_integration():
             "client_id": "client_id_A",
             "client_secret": "client_secret_A",
             "grant_type": "client_credentials",
-            "authCode": "xxxxxx",
+            "code": "xxxxxx",
             
         }
     )

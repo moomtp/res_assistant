@@ -62,6 +62,8 @@ def control_device():
     else :
         mes = "no_op"
 
+    print(f"command is : {command}")
+
     return jsonify({'device status' : mes}) , 200
 
 
