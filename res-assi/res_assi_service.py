@@ -41,6 +41,7 @@ def control_device():
 
 
     command = request.get_json().get('command')
+    print(f"command is : {command}")
     if command == 'turn_on':  # dummy Ops
         # GPIO.output(LEFD_PIN, GPIO.HIGH)
         mes = "Device turned on"
@@ -62,7 +63,6 @@ def control_device():
     else :
         mes = "no_op"
 
-    print(f"command is : {command}")
 
     return jsonify({'device status' : mes}) , 200
 
