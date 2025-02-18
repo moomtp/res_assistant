@@ -17,6 +17,9 @@ config = Config()
 
 # create needed object
 app = Flask(__name__)
+app.config['ENV'] = 'development'
+app.config['DEBUG'] = True
+
 broad_agent = BroadDevice("192.168.1.115")
 
 
