@@ -35,6 +35,9 @@ def control_device():
     oauth_token = {
         'Authorization' : headers.get("Authorization")
     }
+    command = request.get_json().get('command')
+    print(f"command is : {command}", flush=True)
+
     oauth_respone = requests.post(
         f"{config.OAUTH_SERVER}/validate",
         headers=oauth_token,
@@ -43,8 +46,6 @@ def control_device():
         return jsonify({'error': 'Insufficient scope'}), 403
 
 
-    command = request.get_json().get('command')
-    print(f"command is : {command}", flush=True)
     app.logger.info("This is an info log message")
     app.logger.debug("This is a debug log message")
     app.logger.error("This is an error message")
