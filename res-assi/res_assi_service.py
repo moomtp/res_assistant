@@ -44,7 +44,11 @@ def control_device():
 
 
     command = request.get_json().get('command')
-    print(f"command is : {command}")
+    print(f"command is : {command}", flush=True)
+    app.logger.info("This is an info log message")
+    app.logger.debug("This is a debug log message")
+    app.logger.error("This is an error message")
+
     if command == 'turn_on':  # dummy Ops
         # GPIO.output(LEFD_PIN, GPIO.HIGH)
         mes = "Device turned on"
